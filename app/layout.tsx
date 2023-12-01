@@ -16,9 +16,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang='en'>
       <body>
         {/* Header */}
-<Header />
-        
-        {children}</body>
+        <Header />
+
+        {children}
+      </body>
     </html>
   )
 }
