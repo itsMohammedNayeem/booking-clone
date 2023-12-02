@@ -1,3 +1,4 @@
+import SearchForm from '@/components/SearchForm'
 import { trending_data } from '@/data/trending'
 
 export default function Home() {
@@ -8,7 +9,9 @@ export default function Home() {
         <h3 className='py-5 text-xl text-white'>Search low prices on hotels, homes, flights, and much more...</h3>
       </section>
 
-      <section className='m-4 -mb-14 mt-0 px-2 lg:px-4'></section>
+      <section className='m-4 -mb-14 mt-0 px-2 lg:px-4'>
+        <SearchForm />
+      </section>
       <section className='mx-auto mt-10 max-w-7xl rounded-t-lg bg-white p-6'>
         <div className='pt-5'>
           <h3 className='text-xl font-bold'>Trending destinations</h3>
