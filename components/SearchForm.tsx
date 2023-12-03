@@ -1,17 +1,17 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { Button } from '@/components/ui/button'
+import { BedDoubleIcon, CalendarIcon } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
+import { format } from 'date-fns'
+
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { BedDoubleIcon, CalendarIcon } from 'lucide-react'
-import { PopoverTrigger } from '@radix-ui/react-popover'
-import { Button } from './ui/button'
 import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
-import { Popover, PopoverContent } from './ui/popover'
 import { Calendar } from './ui/calendar'
 
 export const formSchema = z.object({
@@ -23,20 +23,18 @@ export const formSchema = z.object({
   adults: z
     .string()
     .min(1, {
-      message: 'Please select atleast 1 adult'
+      message: 'Please select at least 1 adult'
     })
-    .max(12, {
-      message: 'Max 12 adults occupancy per room'
-    }),
+    .max(12, { message: 'Max 12 adults Occupancy' }),
   children: z.string().min(0).max(12, {
-    message: 'Please select at least 1 room'
+    message: 'Max 12 children Occupancy'
   }),
   rooms: z.string().min(1, {
     message: 'Please select at least 1 room'
   })
 })
 
-const SearchForm = () => {
+function SearchForm() {
   const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -53,27 +51,28 @@ const SearchForm = () => {
     }
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-      const checkin_monthday = values.dates.from?.getDate().toString()
-      const checkin_month = (values.dates.from?.getMonth() + 1).toString()
-      const checkin_year = values.dates.from?.getFullYear().toString()
-      const checkout_monthday = values.dates.to?.getDate().toString()
-      const checkout_month = (values.dates.to?.getMonth() + 1).toString()
-      const checkout_year = values.dates.to?.getFullYear().toString()
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
 
-      const checkin = `${checkin_year}-${checkin_month}-${checkin_monthday}`
-      const checkout = `${checkout_year}-${checkout_month}-${checkout_monthday}`
+    const checkin_monthday = values.dates.from.getDate().toString()
+    const checkin_month = (values.dates.from.getMonth() + 1).toString()
+    const checkin_year = values.dates.from.getFullYear().toString()
+    const checkout_monthday = values.dates.to.getDate().toString()
+    const checkout_month = (values.dates.to.getMonth() + 1).toString()
+    const checkout_year = values.dates.to.getFullYear().toString()
 
-      const url = new URL('https://www.booking.com/searchresults.html')
-      url.searchParams.set('ss', values.location)
-      url.searchParams.set('group_adults', values.adults)
-      url.searchParams.set('group_children', values.children)
-      url.searchParams.set('no_rooms', values.rooms)
-      url.searchParams.set('checkin', checkin)
-      url.searchParams.set('checkout', checkout)
+    const checkin = `${checkin_year}-${checkin_month}-${checkin_monthday}`
+    const checkout = `${checkout_year}-${checkout_month}-${checkout_monthday}`
 
-      router.push(`/search?url=${url.href}`)
-      
+    const url = new URL('https://www.booking.com/searchresults.html')
+    url.searchParams.set('ss', values.location)
+    url.searchParams.set('group_adults', values.adults)
+    url.searchParams.set('group_children', values.children)
+    url.searchParams.set('no_rooms', values.rooms)
+    url.searchParams.set('checkin', checkin)
+    url.searchParams.set('checkout', checkout)
+
+    router.push(`/search?url=${url.href}`)
   }
 
   return (
@@ -91,10 +90,11 @@ const SearchForm = () => {
                   Location
                   <BedDoubleIcon className='ml-2 h-4 w-4 text-white' />
                 </FormLabel>
+
                 <FormMessage />
 
                 <FormControl>
-                  <Input {...field} placeholder='London, UK' />
+                  <Input placeholder='London, UK' {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -107,10 +107,7 @@ const SearchForm = () => {
             name='dates'
             render={({ field }) => (
               <FormItem className='flex flex-col'>
-                <FormLabel className='flex text-white'>
-                  Dates
-                  <CalendarIcon className='ml-2 h-4 w-4 text-white' />
-                </FormLabel>
+                <FormLabel className='text-white'>Dates</FormLabel>
                 <FormMessage />
 
                 <Popover>
@@ -139,7 +136,6 @@ const SearchForm = () => {
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
-
                   <PopoverContent className='w-auto p-0' align='start'>
                     <Calendar
                       initialFocus
@@ -166,14 +162,14 @@ const SearchForm = () => {
                 <FormItem className='flex flex-col'>
                   <FormLabel className='text-white'>Adults</FormLabel>
                   <FormMessage />
-
                   <FormControl>
-                    <Input placeholder='Adults' {...field} type='number' />
+                    <Input type='number' placeholder='Adults' {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
           </div>
+
           <div className='grid flex-1 items-center'>
             <FormField
               control={form.control}
@@ -182,14 +178,14 @@ const SearchForm = () => {
                 <FormItem className='flex flex-col'>
                   <FormLabel className='text-white'>Children</FormLabel>
                   <FormMessage />
-
                   <FormControl>
-                    <Input placeholder='Children' {...field} type='number' />
+                    <Input type='number' placeholder='Children' {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
           </div>
+
           <div className='grid flex-1 items-center'>
             <FormField
               control={form.control}
@@ -198,14 +194,14 @@ const SearchForm = () => {
                 <FormItem className='flex flex-col'>
                   <FormLabel className='text-white'>Rooms</FormLabel>
                   <FormMessage />
-
                   <FormControl>
-                    <Input placeholder='Rooms' {...field} type='number' />
+                    <Input type='number' placeholder='rooms' {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
           </div>
+
           <div className='mt-auto'>
             <Button type='submit' className='bg-blue-500 text-base'>
               Search
